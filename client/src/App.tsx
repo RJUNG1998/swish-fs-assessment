@@ -4,6 +4,7 @@ import { MarketFilters } from './components/MarketFilters';
 import { useMarkets } from './hooks/useMarkets';
 import { Filters } from './types';
 import './App.css';
+import { MarketStatistics } from './components/MarketStatistics';
 
 function App() {
   const [filters, setFilters] = useState<Filters>({
@@ -55,7 +56,7 @@ function App() {
 
       <MarketTable markets={markets} onToggleSuspension={toggleSuspension} loading={loading} />
 
-      {/* TODO: Add market statistics component for candidates to implement */}
+      <MarketStatistics markets={markets} loading={loading} />
     </div>
   );
 }

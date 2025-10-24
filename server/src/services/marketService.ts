@@ -1,3 +1,4 @@
+import { OkPacketParams } from 'mysql2';
 import { getPool } from '../config/database';
 import { MarketWithDetails } from '../types';
 
@@ -7,16 +8,34 @@ export class MarketService {
   async getAllMarketsWithDetails(): Promise<MarketWithDetails[]> {
     // Performance could be improved here
     const query = `
-      SELECT
+      SELECT 
         m.*,
-        p.name as player_name,
+        p.name AS player_name,
         p.team_nickname,
         p.team_abbr,
         p.position,
-        st.name as stat_type_name
+        st.name AS stat_type_name,
+        lh.low_line,
+        lh.high_line,
+        a.under_odds,
+        a.over_odds,
+        a.push_odds
       FROM markets m
       JOIN players p ON m.player_id = p.id
       JOIN stat_types st ON m.stat_type_id = st.id
+      LEFT JOIN (
+        SELECT 
+          player_id, 
+          stat_type_id, 
+          MIN(line) AS low_line, 
+          MAX(line) AS high_line
+        FROM alternates
+        GROUP BY player_id, stat_type_id
+      ) lh ON m.player_id = lh.player_id AND m.stat_type_id = lh.stat_type_id
+      LEFT JOIN alternates a 
+        ON a.player_id = m.player_id 
+        AND a.stat_type_id = m.stat_type_id 
+        AND a.line = m.line
       ORDER BY p.name, st.name
     `;
 
@@ -26,8 +45,16 @@ export class MarketService {
     // Calculate low/high lines and suspension status for each market
     const enrichedMarkets = await Promise.all(
       markets.map(async (market) => {
-        const { low_line, high_line } = await this.getLowHighLines(market.player_id, market.stat_type_id);
-        const is_suspended = await this.isMarketSuspended(market);
+        const low_line = market.low_line ?? market.line;
+        const high_line = market.high_line ?? market.line;
+
+        const is_suspended = market.manual_suspension !== null
+          ? Boolean(market.manual_suspension)
+          : market.market_suspended === 1 ||
+            market.under_odds === undefined ||
+            market.over_odds === undefined ||
+            market.push_odds === undefined ||
+            [market.under_odds, market.over_odds, market.push_odds].every((p) => p <= 0.4);
 
         return {
           ...market,
@@ -41,6 +68,7 @@ export class MarketService {
     return enrichedMarkets;
   }
 
+  // This method is not being used after the performance improvement.
   async getLowHighLines(
     playerId: number,
     statTypeId: number
@@ -60,6 +88,7 @@ export class MarketService {
     };
   }
 
+  // This method is not being used after the performance improvement.
   async computeSuspensionStatus(market: any): Promise<boolean> {
     // Rule 1: Check marketSuspended flag
     if (market.market_suspended === 1) {
@@ -74,7 +103,6 @@ export class MarketService {
     `;
 
     const [optimalRows] = await pool.execute(optimalLineQuery, [market.player_id, market.stat_type_id, market.line]);
-
     const optimalLineExists = (optimalRows as any[])[0].count > 0;
 
     if (!optimalLineExists) {
@@ -104,6 +132,7 @@ export class MarketService {
     return !hasValidProbability;
   }
 
+  // This method is not being used after the performance improvement.
   async isMarketSuspended(market: any): Promise<boolean> {
     // If there's a manual override, use that
     if (market.manual_suspension !== null) {
@@ -113,7 +142,6 @@ export class MarketService {
     return await this.computeSuspensionStatus(market);
   }
 
-  // TODO: Candidate needs to implement this method
   async updateManualSuspension(marketId: number, suspended: boolean): Promise<boolean> {
     try {
       const query = `
@@ -122,20 +150,28 @@ export class MarketService {
         WHERE id = ?
       `;
 
-      // TODO: Execute the query with the correct parameters
-      // Hint: valid suspepension values are 0, 1 or NULL
-      const [result] = await pool.execute(query, [
-        ,
-        ,
-        /* TODO: suspended value */ /* TODO: Set updated_at timestamp */ marketId
+      const manualValue = suspended ? 1 : 0;
+      const updatedAt = new Date();
+      const [result] = await pool.execute(query, [manualValue
+        , updatedAt
+        , marketId
       ]);
-
-      // TODO: Return true if the update was successful, false otherwise
-      return /* TODO: Check if update was successful */;
+      const okPacket = result as OkPacketParams;
+      return okPacket.affectedRows > 0;
     } catch (error) {
       console.error('Error updating manual suspension:', error);
       throw new Error('Failed to update manual suspension');
     }
+  }
+
+  async removeManualSuspension(marketId: number): Promise<boolean> {
+    const query = `
+      UPDATE markets
+      SET manual_suspension = NULL, updated_at = ?
+      WHERE id = ?
+    `;
+    const [result] = await pool.execute(query, [new Date(), marketId]);
+    return (result as OkPacketParams).affectedRows > 0;
   }
 
   async getFilteredMarkets(filters: {
@@ -144,22 +180,45 @@ export class MarketService {
     suspensionStatus?: string;
     search?: string;
   }): Promise<MarketWithDetails[]> {
-    let query = `
-      SELECT
-        m.*,
-        p.name as player_name,
-        p.team_nickname,
-        p.team_abbr,
-        p.position,
-        st.name as stat_type_name
-      FROM markets m
-      JOIN players p ON m.player_id = p.id
-      JOIN stat_types st ON m.stat_type_id = st.id
-      WHERE 1=1
-    `;
-
     const params: any[] = [];
 
+    let query = `
+      WITH market_data AS (
+        SELECT
+          m.*,
+          p.name AS player_name,
+          p.team_nickname,
+          p.team_abbr,
+          p.position,
+          st.name AS stat_type_name,
+          lh.low_line,
+          lh.high_line,
+          a.under_odds,
+          a.over_odds,
+          a.push_odds,
+          CASE
+            WHEN m.manual_suspension IS NOT NULL THEN m.manual_suspension
+            WHEN m.market_suspended = 1 THEN 1
+            WHEN a.under_odds IS NULL OR a.over_odds IS NULL OR a.push_odds IS NULL THEN 1
+            WHEN a.under_odds <= 0.4 AND a.over_odds <= 0.4 AND a.push_odds <= 0.4 THEN 1
+            ELSE 0
+          END AS is_suspended
+        FROM markets m
+        JOIN players p ON m.player_id = p.id
+        JOIN stat_types st ON m.stat_type_id = st.id
+        LEFT JOIN (
+          SELECT player_id, stat_type_id, MIN(line) AS low_line, MAX(line) AS high_line
+          FROM alternates
+          GROUP BY player_id, stat_type_id
+        ) lh ON m.player_id = lh.player_id AND m.stat_type_id = lh.stat_type_id
+        LEFT JOIN alternates a
+          ON a.player_id = m.player_id
+          AND a.stat_type_id = m.stat_type_id
+          AND a.line = m.line
+        WHERE 1=1
+    `;
+
+    // Apply filters that can be done in SQL
     if (filters.position) {
       query += ' AND p.position = ?';
       params.push(filters.position);
@@ -175,32 +234,28 @@ export class MarketService {
       params.push(`%${filters.search}%`, `%${filters.search}%`);
     }
 
-    query += ' ORDER BY p.name, st.name';
+    query += ') SELECT * FROM market_data WHERE 1=1';
+
+    // Apply suspension filter directly in SQL
+    if (filters.suspensionStatus) {
+      if (filters.suspensionStatus === 'suspended') {
+        query += ' AND is_suspended = 1';
+      } else if (filters.suspensionStatus === 'active') {
+        query += ' AND is_suspended = 0';
+      }
+    }
+
+    query += ' ORDER BY player_name, stat_type_name';
 
     const [rows] = await pool.execute(query, params);
     const markets = rows as any[];
 
-    // Calculate low/high lines and suspension status for each market
-    const enrichedMarkets = await Promise.all(
-      markets.map(async (market) => {
-        const { low_line, high_line } = await this.getLowHighLines(market.player_id, market.stat_type_id);
-        const is_suspended = await this.isMarketSuspended(market);
-
-        return {
-          ...market,
-          low_line: low_line || market.line,
-          high_line: high_line || market.line,
-          is_suspended
-        };
-      })
-    );
-
-    // Apply suspension filter in memory (inefficient)
-    if (filters.suspensionStatus) {
-      const isSuspended = filters.suspensionStatus === 'suspended';
-      return enrichedMarkets.filter((market) => market.is_suspended === isSuspended);
-    }
-
-    return enrichedMarkets;
+    // Optional: fallback in TS for low_line/high_line
+    return markets.map((market) => ({
+      ...market,
+      low_line: market.low_line ?? market.line,
+      high_line: market.high_line ?? market.line,
+      is_suspended: Boolean(market.is_suspended),
+    }));
   }
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Market, Filters } from '../types';
 import { api } from '../services/api';
 
@@ -6,6 +6,7 @@ export const useMarkets = () => {
   const [markets, setMarkets] = useState<Market[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const updatingRef = useRef<Record<number, boolean>>({});
 
   const fetchMarkets = async (filters?: Partial<Filters>) => {
     try {
@@ -29,6 +30,9 @@ export const useMarkets = () => {
 
   // Handle manual suspension override toggle
   const toggleSuspension = async (marketId: number) => {
+    if (updatingRef.current[marketId]) return; // prevent race
+    updatingRef.current[marketId] = true;
+
     const market = markets.find((m) => m.id === marketId);
     if (!market) return;
 
@@ -63,9 +67,7 @@ export const useMarkets = () => {
 
       // Update server
       if (newManualSuspension === null) {
-        // TODO: Need an API endpoint to remove manual override
-        // For now, we'll use the existing endpoint with null concept
-        await api.updateManualSuspension(marketId, null);
+        await api.removeManualSuspension(marketId);
       } else {
         await api.updateManualSuspension(marketId, Boolean(newManualSuspension));
       }
@@ -83,6 +85,8 @@ export const useMarkets = () => {
             : m
         )
       );
+    } finally {
+      updatingRef.current[marketId] = false;
     }
   };
 

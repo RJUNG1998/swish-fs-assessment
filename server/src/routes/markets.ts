@@ -30,23 +30,62 @@ router.get('/filterOptions', async (req, res) => {
 });
 
 // PUT /api/markets/:id/suspension - Update manual suspension
-// TODO: Candidate needs to implement this endpoint
 router.put('/:id/suspension', async (req, res) => {
   try {
     const marketId = parseInt(req.params.id);
     const { suspended } = req.body;
 
-    // MISSING IMPLEMENTATION - Candidate task
+    if (isNaN(marketId)) {
+      return res.status(400).json({ success: false, error: 'Invalid market ID' });
+    }
+    if (typeof suspended !== 'boolean') {
+      return res.status(400).json({ success: false, error: 'Invalid suspended value' });
+    }
 
-    res.status(501).json({
-      success: false,
-      error: 'Manual suspension update not implemented'
+    // Update the DB with the user input
+    const response = await marketService.updateManualSuspension(marketId, suspended);
+    if (!response) {
+      return res.status(404).json({ success: false, error: 'Market not found' })
+    }
+
+    res.json({
+      success: true,
+      message: `Market ${marketId} suspension updated`,
+      data: { id: marketId, suspended }
     });
   } catch (error) {
     console.error('Error updating manual suspension:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to update manual suspension'
+    });
+  }
+});
+
+// PUT /api/markets/:id/removeManualSuspension - Remove manual suspension
+router.put('/:id/removeManualSuspension', async (req, res) => {
+  try {
+    const marketId = parseInt(req.params.id);
+
+    if (isNaN(marketId)) {
+      return res.status(400).json({ success: false, error: 'Invalid market ID' });
+    }
+
+    const response = await marketService.removeManualSuspension(marketId);
+    if (!response) {
+      return res.status(404).json({ success: false, error: 'Market not found' })
+    }
+
+    res.json({
+      success: true,
+      message: `Market ${marketId} manual suspension removed`,
+      data: { id: marketId }
+    });
+  } catch (error) {
+    console.error('Error removing manual suspension:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to removing manual suspension'
     });
   }
 });

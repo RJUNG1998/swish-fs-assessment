@@ -39,7 +39,17 @@ export const MarketFilters: React.FC<Props> = ({ filters, onFiltersChange }) => 
       <h3>Filters</h3>
 
       <div className="filters-grid">
-        {/* TODO: Candidate needs to implement player/team search functionality */}
+        {/* Player/Team Name Filter */}
+        <div className='filter-player-team'>
+          <label className="form-label">Player/Team:</label>
+          <input
+            type="text"
+            value={filters.search || ''}
+            onChange={(e) => handleFilterChange('search', e.target.value)}
+            placeholder="Search player/team name..."
+            className="form-input"
+          />
+        </div>
 
         {/* Position Filter */}
         <div className="filter-group">

@@ -19,5 +19,10 @@ export const api = {
       suspended
     });
     return response.data.success;
-  }
+  },
+
+  async removeManualSuspension(marketId: number): Promise<boolean> {
+    const response = await axios.put(`${API_BASE_URL}/markets/${marketId}/removeManualSuspension`);
+    return response.data.success;
+  },
 };
