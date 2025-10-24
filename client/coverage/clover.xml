@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1761149140150" clover="3.2.0">
+  <project timestamp="1761149140151" name="All files">
+    <metrics statements="108" coveredstatements="79" conditionals="31" coveredconditionals="19" methods="34" coveredmethods="25" elements="173" coveredelements="123" complexity="0" loc="108" ncloc="108" packages="4" files="7" classes="7"/>
+    <package name="src">
+      <metrics statements="15" coveredstatements="13" conditionals="1" coveredconditionals="1" methods="4" coveredmethods="2"/>
+      <file name="App.tsx" path="/Users/melissa/Documents/interviews/swish-fs-assessment/client/src/App.tsx">
+        <metrics statements="15" coveredstatements="13" conditionals="1" coveredconditionals="1" methods="4" coveredmethods="2"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="9" count="6" type="stmt"/>
+        <line num="16" count="6" type="stmt"/>
+        <line num="18" count="6" type="stmt"/>
+        <line num="19" count="4" type="stmt"/>
+        <line num="22" count="6" type="stmt"/>
+        <line num="23" count="0" type="stmt"/>
+        <line num="26" count="6" type="cond" truecount="1" falsecount="0"/>
+        <line num="27" count="2" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="38" count="4" type="stmt"/>
+        <line num="68" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.components">
+      <metrics statements="41" coveredstatements="41" conditionals="15" coveredconditionals="15" methods="17" coveredmethods="17"/>
+      <file name="MarketFilters.tsx" path="/Users/melissa/Documents/interviews/swish-fs-assessment/client/src/components/MarketFilters.tsx">
+        <metrics statements="20" coveredstatements="20" conditionals="0" coveredconditionals="0" methods="10" coveredmethods="10"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="10" count="2" type="stmt"/>
+        <line num="11" count="15" type="stmt"/>
+        <line num="17" count="15" type="stmt"/>
+        <line num="18" count="10" type="stmt"/>
+        <line num="19" count="10" type="stmt"/>
+        <line num="20" count="10" type="stmt"/>
+        <line num="21" count="6" type="stmt"/>
+        <line num="23" count="4" type="stmt"/>
+        <line num="27" count="10" type="stmt"/>
+        <line num="30" count="15" type="stmt"/>
+        <line num="31" count="4" type="stmt"/>
+        <line num="37" count="15" type="stmt"/>
+        <line num="49" count="1" type="stmt"/>
+        <line num="55" count="15" type="stmt"/>
+        <line num="67" count="1" type="stmt"/>
+        <line num="73" count="10" type="stmt"/>
+        <line num="84" count="1" type="stmt"/>
+        <line num="99" count="1" type="stmt"/>
+      </file>
+      <file name="MarketStats.tsx" path="/Users/melissa/Documents/interviews/swish-fs-assessment/client/src/components/MarketStats.tsx">
+        <metrics statements="3" coveredstatements="3" conditionals="2" coveredconditionals="2" methods="2" coveredmethods="2"/>
+        <line num="8" count="2" type="stmt"/>
+        <line num="9" count="6" type="stmt"/>
+        <line num="11" count="6" type="stmt"/>
+      </file>
+      <file name="MarketTable.tsx" path="/Users/melissa/Documents/interviews/swish-fs-assessment/client/src/components/MarketTable.tsx">
+        <metrics statements="15" coveredstatements="15" conditionals="13" coveredconditionals="13" methods="5" coveredmethods="5"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="10" count="2" type="stmt"/>
+        <line num="11" count="9" type="cond" truecount="1" falsecount="0"/>
+        <line num="12" count="5" type="stmt"/>
+        <line num="15" count="4" type="cond" truecount="1" falsecount="0"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="19" count="3" type="stmt"/>
+        <line num="20" count="9" type="cond" truecount="2" falsecount="0"/>
+        <line num="23" count="3" type="stmt"/>
+        <line num="24" count="9" type="cond" truecount="1" falsecount="0"/>
+        <line num="25" count="3" type="stmt"/>
+        <line num="27" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="30" count="3" type="stmt"/>
+        <line num="48" count="9" type="stmt"/>
+        <line num="71" count="1" type="stmt"/>
+      </file>
+      <file name="index.ts" path="/Users/melissa/Documents/interviews/swish-fs-assessment/client/src/components/index.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.hooks">
+      <metrics statements="43" coveredstatements="20" conditionals="15" coveredconditionals="3" methods="10" coveredmethods="4"/>
+      <file name="useMarkets.ts" path="/Users/melissa/Documents/interviews/swish-fs-assessment/client/src/hooks/useMarkets.ts">
+        <metrics statements="43" coveredstatements="20" conditionals="15" coveredconditionals="3" methods="10" coveredmethods="4"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="6" type="stmt"/>
+        <line num="7" count="6" type="stmt"/>
+        <line num="8" count="6" type="stmt"/>
+        <line num="10" count="6" type="stmt"/>
+        <line num="11" count="8" type="stmt"/>
+        <line num="12" count="8" type="stmt"/>
+        <line num="13" count="8" type="stmt"/>
+        <line num="16" count="8" type="cond" truecount="2" falsecount="0"/>
+        <line num="18" count="16" type="cond" truecount="1" falsecount="1"/>
+        <line num="22" count="8" type="stmt"/>
+        <line num="23" count="0" type="stmt"/>
+        <line num="25" count="8" type="stmt"/>
+        <line num="26" count="8" type="stmt"/>
+        <line num="28" count="8" type="stmt"/>
+        <line num="33" count="6" type="stmt"/>
+        <line num="34" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
+        <line num="37" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="38" count="0" type="stmt"/>
+        <line num="39" count="0" type="stmt"/>
+        <line num="42" count="0" type="stmt"/>
+        <line num="46" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="48" count="0" type="stmt"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="54" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="55" count="0" type="stmt"/>
+        <line num="59" count="0" type="stmt"/>
+        <line num="60" count="0" type="stmt"/>
+        <line num="61" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="72" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="75" count="0" type="stmt"/>
+        <line num="77" count="0" type="stmt"/>
+        <line num="80" count="0" type="stmt"/>
+        <line num="82" count="0" type="stmt"/>
+        <line num="83" count="0" type="stmt"/>
+        <line num="84" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="94" count="0" type="stmt"/>
+        <line num="98" count="6" type="stmt"/>
+        <line num="99" count="4" type="stmt"/>
+        <line num="102" count="6" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.services">
+      <metrics statements="9" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="2"/>
+      <file name="api.ts" path="/Users/melissa/Documents/interviews/swish-fs-assessment/client/src/services/api.ts">
+        <metrics statements="9" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="2"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="8" count="8" type="stmt"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="13" count="4" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="18" count="0" type="stmt"/>
+        <line num="22" count="0" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>
